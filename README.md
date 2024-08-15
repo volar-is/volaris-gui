@@ -1,6 +1,5 @@
-# Tauri + SvelteKit
-
-This template should help get you started developing with Tauri and SvelteKit in Vite.
+# VOLARIS GUI
+i'll get to making this readme soon
 
 ## Recommended IDE Setup
 
