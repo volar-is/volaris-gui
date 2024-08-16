@@ -69,8 +69,13 @@
           name: password,
           path: newKeyFilePath,
         });
-        keyFile = result.keyfilePath;
-        alert("Key file created successfully.");
+        if (password.endsWith(".key")) {
+          keyFile = newKeyFilePath + "/" + password;
+        } else {
+          keyFile = newKeyFilePath + "/" + password + ".key";
+        }
+        
+        alert("Key file created successfully." + "\n" + keyFile);
       } catch (error) {
         alert("Error creating key file: " + error);
       }
@@ -112,7 +117,10 @@
   }
 
   async function decryptFile() {
-    if (selectedFile && keyFile) {
+    console.warn(keyFile);
+
+    if (selectedFile && keyFile !== undefined) {
+      console.warn("Running")
       try {
         const confirmation = await ask(
           "Are you sure you want to decrypt this file?",
@@ -132,8 +140,12 @@
       } catch (error) {
         alert("Error during decryption: " + error);
       }
-    } else {
-      alert("Please select a file and a keyfile first.");
+    } else if ((keyFile === "" || keyFile === undefined) && selectedFile === "") {
+      alert("Please select a file and keyfile.");
+    } else if (keyFile === "" || keyFile === undefined) {
+      alert("Please select or create a keyfile first.");
+    } else if (selectedFile == "") {
+      alert("Please select a file first.");
     }
   }
 
