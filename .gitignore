@@ -356,3 +356,4 @@ vite.config.ts.*
 
 /test-data
 /config.json
+src-tauri/gen/android/build.gradle.kts
