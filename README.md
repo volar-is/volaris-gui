@@ -4,6 +4,8 @@ Volaris GUI is a sleek and modern Svelte/Tauri-based application designed to str
 
 Volaris GUI is a sub-project of [Volaris](https://github.com/volar-is/volaris), find out more info about Volaris and it's encryption methods there.
 
+THIS IS IN DEVELOPEMENT, IT IS GOING TO BE SLOW.
+
 ## Features
 
 - **File Encryption & Decryption**: Easily encrypt or decrypt files with just a few clicks.
