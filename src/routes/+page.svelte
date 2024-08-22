@@ -117,8 +117,6 @@
   }
 
   async function decryptFile() {
-    console.warn(keyFile);
-
     if (selectedFile && keyFile !== undefined) {
       console.warn("Running")
       try {

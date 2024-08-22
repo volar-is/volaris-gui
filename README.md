@@ -6,6 +6,8 @@ Volaris GUI is a sub-project of [Volaris](https://github.com/volar-is/volaris), 
 
 THIS IS IN DEVELOPEMENT, IT IS GOING TO BE SLOW.
 
+BUILDS DO NOT WORK! APP WORKS PROPERLY USING PNPM TAURI DEV THOUGH.
+
 ## Features
 
 - **File Encryption & Decryption**: Easily encrypt or decrypt files with just a few clicks.
@@ -23,7 +25,7 @@ N/A
 
 To run the project, you'll need to have the following installed:
 
-- [Node.js](https://nodejs.org/) (v16.x or later)
+- [Node.js](https://nodejs.org/) (v18.x or later)
 - [Pnpm](https://pnpm.io)
 - [Tauri](https://tauri.app/)
 

@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@tauri-apps/api": "2.0.0-rc.0",
+    "@tauri-apps/api": "2.0.0-rc.2",
     "@tauri-apps/plugin-dialog": "2.0.0-rc.0",
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0"
   },
@@ -21,7 +21,7 @@
     "@sveltejs/adapter-static": "^3.0.1",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
-    "@tauri-apps/cli": ">=2.0.0-rc.0",
+    "@tauri-apps/cli": ">=2.0.0-rc.2",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.41",
     "svelte": "^4.2.7",

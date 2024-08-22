@@ -1,17 +1,20 @@
+use std::fs;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::Read;
+use std::ops::Deref;
 use std::path::PathBuf;
 use std::cell::RefCell;
 use tauri::{command, AppHandle};
 use tauri_plugin_dialog::DialogExt;
 use volaris_tools::decrypt::{Request as d_request, execute as d_execute};
 use volaris_tools::encrypt::{Request as e_request, execute as e_execute};
+use volaris_crypto::key::{balloon_hash, generate_passphrase};
 use volaris_crypto::protected::Protected; 
-use volaris_crypto::header::{HeaderVersion, HashingAlgorithm, HeaderType};
-use volaris_crypto::primitives::{Mode, Algorithm};
+use volaris_crypto::header::{HashingAlgorithm, HeaderType, HEADER_VERSION, BLAKE3BALLOON_LATEST};
+use volaris_crypto::primitives::{Mode, Algorithm, gen_salt};
 
 #[command]
-fn create_key_file(path: PathBuf, name: String) -> Result<String, String> {
+async fn create_key_file(path: PathBuf, name: String) -> Result<String, String> {
     let mut name = name;
     if !name.ends_with(".key") {
         name.push_str(".key");
@@ -20,17 +23,23 @@ fn create_key_file(path: PathBuf, name: String) -> Result<String, String> {
     let mut key_file_path = path;
     key_file_path.push(name);
 
-    // Generate a 32-byte key
-    let raw_key: [u8; 32] = rand::random();
 
-    // Write the key to a file
-    let mut file = File::create(key_file_path).map_err(|e| e.to_string())?;
-    file.write_all(&raw_key).map_err(|e| e.to_string())?;
+    use std::time::Instant;
+    let now = Instant::now();
+    let salt = gen_salt();
+    let secret_data = generate_passphrase(&32).as_bytes().to_vec();
+    let raw_key = Protected::new(secret_data);
+    let elapsed = now.elapsed();
+    eprintln!("Raw Key Elapsed: {:.2?}", elapsed);
+    let key = balloon_hash(raw_key, &salt, &HEADER_VERSION).map_err(|e| e.to_string())?;
+    fs::write(key_file_path, key.deref()).map_err(|e| e.to_string())?;
+    let elapsed = now.elapsed();
+    eprintln!("Key Elapsed: {:.2?}", elapsed);
 
     Ok("Key file created successfully.".to_string())
 }
 
-fn check_file_exists(app: &AppHandle, path: &PathBuf) -> Result<(), String> {
+async fn check_file_exists(app: &AppHandle, path: &PathBuf) -> Result<(), String> {
     if path.exists() {
         let answer = app
             .dialog()
@@ -49,6 +58,7 @@ fn check_file_exists(app: &AppHandle, path: &PathBuf) -> Result<(), String> {
 
 
 #[command]
+// todo: add multiple hashing and encryption methods (BLAKE3/ARGON + Aes256Gcm/XChaCha20Poly1305)
 async fn encrypt_file_with_key(
     app: AppHandle,
     input: String,
@@ -59,10 +69,9 @@ async fn encrypt_file_with_key(
     let output_path = PathBuf::from(output);
     let keyfile_path = PathBuf::from(keyfile);
 
-    check_file_exists(&app, &output_path)?;
-    print!("Running Encrypt");
+    check_file_exists(&app, &output_path).await.map_err(|e| e.to_string())?;
+    println!("Running Encrypt");
 
-    // Read key from keyfile
     let mut keyfile = File::open(keyfile_path).map_err(|e| e.to_string())?;
     let mut key_data = Vec::new();
     keyfile.read_to_end(&mut key_data).map_err(|e| e.to_string())?;
@@ -71,32 +80,28 @@ async fn encrypt_file_with_key(
         return Err("Invalid key size. The key must be 32 bytes long.".to_string());
     }
 
-    // Read input file
     let mut input_file = File::open(input_path).map_err(|e| e.to_string())?;
     let mut input_data = Vec::new();
     input_file.read_to_end(&mut input_data).map_err(|e| e.to_string())?;
 
-    // Create a buffer as a cursor for encryption
     let input_cursor = std::io::Cursor::new(input_data);
 
-    // Set up the necessary I/O using RefCell for mutable borrows
-    let mut output_file = File::create(&output_path).map_err(|e| e.to_string())?;
+    let output_file = File::create(&output_path).map_err(|e| e.to_string())?;
+    
 
-    // Create a request for encryption
     let request = e_request {
         reader: &RefCell::new(input_cursor),
         writer: &RefCell::new(output_file),
-        header_writer: None, // Add appropriate value if needed
+        header_writer: None, // for now, option will be added in future
         raw_key: Protected::new(key_data),
-        hashing_algorithm: HashingAlgorithm::Blake3Balloon(4),
+        hashing_algorithm: HashingAlgorithm::Blake3Balloon(BLAKE3BALLOON_LATEST),
         header_type: HeaderType {
-            version: HeaderVersion::V5,
+            version: HEADER_VERSION,
             algorithm: Algorithm::XChaCha20Poly1305,
             mode: Mode::StreamMode,
         },
     };
 
-    // Execute the encryption
     e_execute(request).map_err(|e| e.to_string())?;
     print!("Encrypt Finished");
     Ok("Encryption successful".to_string())
@@ -113,37 +118,34 @@ async fn decrypt_file_with_key(
     let output_path = PathBuf::from(output);
     let keyfile_path = PathBuf::from(keyfile);
 
-    check_file_exists(&app, &output_path)?;
-    print!("Running Decrypt");
+    check_file_exists(&app, &output_path).await.map_err(|e| e.to_string())?;
 
-    // Read key from keyfile
     let mut keyfile = File::open(keyfile_path).map_err(|e| e.to_string())?;
     let mut key_data = Vec::new();
+
     keyfile.read_to_end(&mut key_data).map_err(|e| e.to_string())?;
 
     if key_data.len() != 32 {
         return Err("Invalid key size. The key must be 32 bytes long.".to_string());
     }
 
-    // Set up the necessary I/O using RefCell for mutable borrows
     let input_file = File::open(input_path).map_err(|e| e.to_string())?;
     let output_file = File::create(output_path).map_err(|e| e.to_string())?;
     let reader = RefCell::new(input_file);
     let writer = RefCell::new(output_file);
+    use std::time::Instant;
+    let now = Instant::now();
+    let protected_key = Protected::new(key_data);
 
-    // Create a request for decryption
-    let req = d_request {
-        header_reader: None, // Add appropriate value if needed
+    d_execute( d_request {
+        header_reader: None,
         reader: &reader,
         writer: &writer,
-        raw_key: Protected::new(key_data),
-        on_decrypted_header: None, // Add appropriate value if needed
-    };
-
-    // Execute the decryption
-    d_execute(req).map_err(|e| e.to_string())?;
-
-    print!("Decrypt finished.");
+        raw_key: protected_key,
+        on_decrypted_header: None,
+    }).map_err(|e| e.to_string())?;
+    let elapsed = now.elapsed();
+    eprintln!("Elapsed: {:.2?}", elapsed);
     Ok("Decryption successful".to_string())
 }
 
