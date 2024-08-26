@@ -8,13 +8,13 @@ use tauri::{command, AppHandle};
 use tauri_plugin_dialog::DialogExt;
 use volaris_tools::decrypt::{Request as d_request, execute as d_execute};
 use volaris_tools::encrypt::{Request as e_request, execute as e_execute};
-use volaris_crypto::key::{balloon_hash, generate_passphrase};
+use volaris_crypto::key::{balloon_hash, generate_passphrase, argon2id_hash};
 use volaris_crypto::protected::Protected; 
-use volaris_crypto::header::{HashingAlgorithm, HeaderType, HEADER_VERSION, BLAKE3BALLOON_LATEST};
+use volaris_crypto::header::{HeaderVersion, HashingAlgorithm, HeaderType, BLAKE3BALLOON_LATEST, ARGON2ID_LATEST};
 use volaris_crypto::primitives::{Mode, Algorithm, gen_salt};
 
 #[command]
-async fn create_key_file(path: PathBuf, name: String) -> Result<String, String> {
+async fn create_key_file(path: PathBuf, name: String, hash: String, header: String) -> Result<String, String> {
     let mut name = name;
     if !name.ends_with(".key") {
         name.push_str(".key");
@@ -24,17 +24,29 @@ async fn create_key_file(path: PathBuf, name: String) -> Result<String, String> 
     key_file_path.push(name);
 
 
-    use std::time::Instant;
-    let now = Instant::now();
+    let now = std::time::Instant::now();
     let salt = gen_salt();
     let secret_data = generate_passphrase(&32).as_bytes().to_vec();
     let raw_key = Protected::new(secret_data);
     let elapsed = now.elapsed();
     eprintln!("Raw Key Elapsed: {:.2?}", elapsed);
-    let key = balloon_hash(raw_key, &salt, &HEADER_VERSION).map_err(|e| e.to_string())?;
+
+    let header_version_enum = match header.to_lowercase().as_str() {
+        "v3" => HeaderVersion::V3,
+        "v4" => HeaderVersion::V4,
+        "v5" => HeaderVersion::V5,
+        _ => return Err(format!("Unsupported header version: {}", header).into()),
+    };
+    
+
+    let key = match hash.as_str() {
+        "Blake3Balloon" => balloon_hash(raw_key, &salt, &header_version_enum).map_err(|e| e.to_string())?,
+        "Argon2ID" => argon2id_hash(raw_key, &salt, &header_version_enum).map_err(|e| e.to_string())?,
+        _ => return Err(format!("Unsupported hash algorithm: {}", hash).into()),
+    };
+
     fs::write(key_file_path, key.deref()).map_err(|e| e.to_string())?;
-    let elapsed = now.elapsed();
-    eprintln!("Key Elapsed: {:.2?}", elapsed);
+    eprintln!("Key Elapsed: {:.2?}", now.elapsed());
 
     Ok("Key file created successfully.".to_string())
 }
@@ -56,14 +68,16 @@ async fn check_file_exists(app: &AppHandle, path: &PathBuf) -> Result<(), String
     Ok(())
 }
 
-
 #[command]
-// todo: add multiple hashing and encryption methods (BLAKE3/ARGON + Aes256Gcm/XChaCha20Poly1305)
+// Updated to support multiple hashing and encryption methods
 async fn encrypt_file_with_key(
     app: AppHandle,
     input: String,
     output: String,
     keyfile: String,
+    hash: String,
+    ealgorithm: String,
+    headerver: String,
 ) -> Result<String, String> {
     let input_path = PathBuf::from(input);
     let output_path = PathBuf::from(output);
@@ -85,19 +99,36 @@ async fn encrypt_file_with_key(
     input_file.read_to_end(&mut input_data).map_err(|e| e.to_string())?;
 
     let input_cursor = std::io::Cursor::new(input_data);
-
     let output_file = File::create(&output_path).map_err(|e| e.to_string())?;
-    
+
+    let hash = match hash.as_str() {
+        "Blake3Balloon" => HashingAlgorithm::Blake3Balloon(BLAKE3BALLOON_LATEST),
+        "Argon2ID" => HashingAlgorithm::Argon2id(ARGON2ID_LATEST),
+        _ => return Err("Unsupported hashing algorithm.".to_string()),
+    };
+
+    let ealgorithm = match ealgorithm.as_str() {
+        "AES-256-GCM" => Algorithm::Aes256Gcm,
+        "XChaCha20Poly1305" => Algorithm::XChaCha20Poly1305,
+        _ => return Err("Unsupported encryption algorithm.".to_string()),
+    };
+
+    let headerver = match headerver.to_lowercase().as_str() {
+        "v3" => HeaderVersion::V3,
+        "v4" => HeaderVersion::V4,
+        "v5" => HeaderVersion::V5,
+        _ => return Err(format!("Unsupported header version: {}", headerver).into()),
+    };
 
     let request = e_request {
         reader: &RefCell::new(input_cursor),
         writer: &RefCell::new(output_file),
-        header_writer: None, // for now, option will be added in future
+        header_writer: None,
         raw_key: Protected::new(key_data),
-        hashing_algorithm: HashingAlgorithm::Blake3Balloon(BLAKE3BALLOON_LATEST),
+        hashing_algorithm: hash,
         header_type: HeaderType {
-            version: HEADER_VERSION,
-            algorithm: Algorithm::XChaCha20Poly1305,
+            version: headerver,
+            algorithm: ealgorithm,
             mode: Mode::StreamMode,
         },
     };
@@ -122,7 +153,6 @@ async fn decrypt_file_with_key(
 
     let mut keyfile = File::open(keyfile_path).map_err(|e| e.to_string())?;
     let mut key_data = Vec::new();
-
     keyfile.read_to_end(&mut key_data).map_err(|e| e.to_string())?;
 
     if key_data.len() != 32 {
@@ -133,19 +163,19 @@ async fn decrypt_file_with_key(
     let output_file = File::create(output_path).map_err(|e| e.to_string())?;
     let reader = RefCell::new(input_file);
     let writer = RefCell::new(output_file);
-    use std::time::Instant;
-    let now = Instant::now();
+
+    let now = std::time::Instant::now();
     let protected_key = Protected::new(key_data);
 
-    d_execute( d_request {
+    d_execute(d_request {
         header_reader: None,
         reader: &reader,
         writer: &writer,
         raw_key: protected_key,
         on_decrypted_header: None,
     }).map_err(|e| e.to_string())?;
-    let elapsed = now.elapsed();
-    eprintln!("Elapsed: {:.2?}", elapsed);
+    
+    eprintln!("Elapsed: {:.2?}", now.elapsed());
     Ok("Decryption successful".to_string())
 }
 
@@ -160,4 +190,3 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
