@@ -16,6 +16,8 @@
     "dialog:default",
     "dialog:default",
     "dialog:default",
-    "dialog:default"
+    "dialog:default",
+    "notification:default",
+    "notification:default"
   ]
 }

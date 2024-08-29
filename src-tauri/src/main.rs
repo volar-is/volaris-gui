@@ -1,20 +1,27 @@
+use std::cell::RefCell;
 use std::fs;
 use std::fs::File;
 use std::io::Read;
 use std::ops::Deref;
 use std::path::PathBuf;
-use std::cell::RefCell;
 use tauri::{command, AppHandle};
 use tauri_plugin_dialog::DialogExt;
-use volaris_tools::decrypt::{Request as d_request, execute as d_execute};
-use volaris_tools::encrypt::{Request as e_request, execute as e_execute};
-use volaris_crypto::key::{balloon_hash, generate_passphrase, argon2id_hash};
-use volaris_crypto::protected::Protected; 
-use volaris_crypto::header::{HeaderVersion, HashingAlgorithm, HeaderType, BLAKE3BALLOON_LATEST, ARGON2ID_LATEST};
-use volaris_crypto::primitives::{Mode, Algorithm, gen_salt};
+use volaris_crypto::header::{
+    HashingAlgorithm, HeaderType, HeaderVersion, ARGON2ID_LATEST, BLAKE3BALLOON_LATEST,
+};
+use volaris_crypto::key::{argon2id_hash, balloon_hash, generate_passphrase};
+use volaris_crypto::primitives::{gen_salt, Algorithm, Mode};
+use volaris_crypto::protected::Protected;
+use volaris_tools::decrypt::{execute as d_execute, Request as d_request};
+use volaris_tools::encrypt::{execute as e_execute, Request as e_request};
 
 #[command]
-async fn create_key_file(path: PathBuf, name: String, hash: String, header: String) -> Result<String, String> {
+async fn create_key_file(
+    path: PathBuf,
+    name: String,
+    hash: String,
+    header: String,
+) -> Result<String, String> {
     let mut name = name;
     if !name.ends_with(".key") {
         name.push_str(".key");
@@ -22,7 +29,6 @@ async fn create_key_file(path: PathBuf, name: String, hash: String, header: Stri
 
     let mut key_file_path = path;
     key_file_path.push(name);
-
 
     let now = std::time::Instant::now();
     let salt = gen_salt();
@@ -37,11 +43,14 @@ async fn create_key_file(path: PathBuf, name: String, hash: String, header: Stri
         "v5" => HeaderVersion::V5,
         _ => return Err(format!("Unsupported header version: {}", header).into()),
     };
-    
 
     let key = match hash.as_str() {
-        "Blake3Balloon" => balloon_hash(raw_key, &salt, &header_version_enum).map_err(|e| e.to_string())?,
-        "Argon2ID" => argon2id_hash(raw_key, &salt, &header_version_enum).map_err(|e| e.to_string())?,
+        "Blake3Balloon" => {
+            balloon_hash(raw_key, &salt, &header_version_enum).map_err(|e| e.to_string())?
+        }
+        "Argon2ID" => {
+            argon2id_hash(raw_key, &salt, &header_version_enum).map_err(|e| e.to_string())?
+        }
         _ => return Err(format!("Unsupported hash algorithm: {}", hash).into()),
     };
 
@@ -83,12 +92,16 @@ async fn encrypt_file_with_key(
     let output_path = PathBuf::from(output);
     let keyfile_path = PathBuf::from(keyfile);
 
-    check_file_exists(&app, &output_path).await.map_err(|e| e.to_string())?;
+    check_file_exists(&app, &output_path)
+        .await
+        .map_err(|e| e.to_string())?;
     println!("Running Encrypt");
 
     let mut keyfile = File::open(keyfile_path).map_err(|e| e.to_string())?;
     let mut key_data = Vec::new();
-    keyfile.read_to_end(&mut key_data).map_err(|e| e.to_string())?;
+    keyfile
+        .read_to_end(&mut key_data)
+        .map_err(|e| e.to_string())?;
 
     if key_data.len() != 32 {
         return Err("Invalid key size. The key must be 32 bytes long.".to_string());
@@ -96,7 +109,9 @@ async fn encrypt_file_with_key(
 
     let mut input_file = File::open(input_path).map_err(|e| e.to_string())?;
     let mut input_data = Vec::new();
-    input_file.read_to_end(&mut input_data).map_err(|e| e.to_string())?;
+    input_file
+        .read_to_end(&mut input_data)
+        .map_err(|e| e.to_string())?;
 
     let input_cursor = std::io::Cursor::new(input_data);
     let output_file = File::create(&output_path).map_err(|e| e.to_string())?;
@@ -149,11 +164,15 @@ async fn decrypt_file_with_key(
     let output_path = PathBuf::from(output);
     let keyfile_path = PathBuf::from(keyfile);
 
-    check_file_exists(&app, &output_path).await.map_err(|e| e.to_string())?;
+    check_file_exists(&app, &output_path)
+        .await
+        .map_err(|e| e.to_string())?;
 
     let mut keyfile = File::open(keyfile_path).map_err(|e| e.to_string())?;
     let mut key_data = Vec::new();
-    keyfile.read_to_end(&mut key_data).map_err(|e| e.to_string())?;
+    keyfile
+        .read_to_end(&mut key_data)
+        .map_err(|e| e.to_string())?;
 
     if key_data.len() != 32 {
         return Err("Invalid key size. The key must be 32 bytes long.".to_string());
@@ -173,14 +192,16 @@ async fn decrypt_file_with_key(
         writer: &writer,
         raw_key: protected_key,
         on_decrypted_header: None,
-    }).map_err(|e| e.to_string())?;
-    
+    })
+    .map_err(|e| e.to_string())?;
+
     eprintln!("Elapsed: {:.2?}", now.elapsed());
     Ok("Decryption successful".to_string())
 }
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             create_key_file,

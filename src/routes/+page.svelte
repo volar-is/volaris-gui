@@ -4,6 +4,11 @@
   import { listen } from "@tauri-apps/api/event";
   import PasswordPrompt from "./PasswordPrompt.svelte";
   import { ask } from "@tauri-apps/plugin-dialog";
+  import {
+    isPermissionGranted,
+    requestPermission,
+    sendNotification,
+  } from "@tauri-apps/plugin-notification";
   import "./app.css";
 
   let selectedFile = "";
@@ -151,6 +156,16 @@
         } else {
           keyFile = newKeyFilePath + "/" + password + ".key";
         }
+        let permissionGranted = await isPermissionGranted();
+
+        if (!permissionGranted) {
+          const permission = await requestPermission();
+          permissionGranted = permission === "granted";
+        }
+
+        if (permissionGranted) {
+          sendNotification({ title: "Volaris", body: "Key File Created!" });
+        }
         alert("Key file created successfully." + "\n" + keyFile);
         step = 1;
       } catch (error) {
@@ -178,9 +193,9 @@
           const interval = setInterval(() => {
             elapsedTime = (Date.now() - startTime) / 1000;
             if (progress < 84) {
-              progress += Math.round(Math.random() * 2.5);
+              progress += Math.round(Math.random() * 4);
             } else if (progress > 83 || progress === 84) {
-              progress += 0.5;
+              progress += Math.floor(Math.random() * 1);
               progdelay = 1000;
             }
           }, progdelay);
@@ -199,6 +214,19 @@
           await delay(1000);
           elapsedTime = (Date.now() - startTime) / 1000;
           isProcessing = false;
+          let permissionGranted = await isPermissionGranted();
+
+          if (!permissionGranted) {
+            const permission = await requestPermission();
+            permissionGranted = permission === "granted";
+          }
+
+          if (permissionGranted) {
+            sendNotification({
+              title: "Volaris",
+              body: "Your file has been encrypted!",
+            });
+          }
           alert("File encrypted successfully: " + result);
         } else {
           alert("Encryption canceled.");
@@ -232,7 +260,7 @@
             if (progress < 84) {
               progress += Math.round(Math.random() * 4);
             } else if (progress > 83 || progress === 84) {
-              progress += Math.round(Math.random() * 1);
+              progress += Math.floor(Math.random() * 1);
               progdelay = 1000;
             }
           }, progdelay);
@@ -248,6 +276,16 @@
           await delay(1000);
           elapsedTime = (Date.now() - startTime) / 1000;
           isProcessing = false;
+          let permissionGranted = await isPermissionGranted();
+
+          if (!permissionGranted) {
+            const permission = await requestPermission();
+            permissionGranted = permission === "granted";
+          }
+
+          if (permissionGranted) {
+            sendNotification({ title: "Volaris", body: "Your file has been decrypted!" });
+          }
           alert("File decrypted successfully: " + result);
         } else {
           alert("Decryption canceled.");
@@ -433,7 +471,7 @@
       {#if step === 3}
         <div class="flex flex-col items-center space-y-4 md:space-y-6">
           <div
-            class="w-full max-w-7xl bg-gray-700 p-4 md:p-6 rounded-lg shadow-lg"
+            class="w-full max-w-7xl p-4 md:p-6 rounded-lg"
           >
             <h2
               class="text-center text-xl md:text-2xl font-semibold text-gray-100 mb-4"
@@ -443,7 +481,7 @@
             <div class="flex flex-col gap-4">
               <button
                 on:click={saveKeyFile}
-                class="px-4 py-2 md:px-6 md:py-3 text-base md:text-lg font-semibold bg-purple-600 hover:bg-purple-500 text-white rounded-full flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-300"
+                class="px-4 py-2 md:px-6 md:py-3 text-base md:text-lg font-semibold bg-purple-600 hover:bg-purple-500 text-white rounded-full flex items-center justify-center transition-all duration-300 focus:ring-4 focus:ring-purple-300"
                 style="height: 48px;"
               >
                 <span class="material-symbols-outlined text-base md:text-lg"
