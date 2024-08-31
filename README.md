@@ -17,7 +17,9 @@ BUILDS DO NOT WORK! APP WORKS PROPERLY USING PNPM TAURI DEV THOUGH.
 
 ## Screenshots
 
-N/A
+![Screenshot from 2024-08-31 21-43-54](https://github.com/user-attachments/assets/0a1b6424-6b42-4de1-89d4-58d4e017a763)
+
+More in [here.](./screenshots)
 
 ## Getting Started
 
@@ -87,6 +89,7 @@ Please ensure your code adheres to our coding standards and includes appropriate
 **Note:** This repository uses conventional commits. Please follow the [conventional commits guidelines](https://www.conventionalcommits.org/en/v1.0.0/) for your commit messages.
 
 ### License
+
 
 This project is licensed under the BSD 2-Clause License License. See the [LICENSE](/LICENSE) file for details.
 
