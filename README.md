@@ -25,7 +25,7 @@ N/A
 
 To run the project, you'll need to have the following installed:
 
-- [Node.js](https://nodejs.org/) (v18.x or later)
+- [Node.js](https://nodejs.org/) (v18.x or later *should* work)
 - [Pnpm](https://pnpm.io)
 - [Tauri](https://tauri.app/)
 
