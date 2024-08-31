@@ -17,7 +17,7 @@ BUILDS DO NOT WORK! APP WORKS PROPERLY USING PNPM TAURI DEV THOUGH.
 
 ## Screenshots
 
-![Screenshot from 2024-08-31 21-43-54](https://github.com/user-attachments/assets/0a1b6424-6b42-4de1-89d4-58d4e017a763)
+![Screen1](./screenshots/1.png)
 
 More in [here.](./screenshots)
 
