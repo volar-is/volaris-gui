@@ -40,6 +40,7 @@
 	<supports>
 		<control>pointing</control>
 		<control>keyboard</control>
+		<control>touch</control>
 	</supports>
 	<recommends>
 		<display_length compare="ge">200</display_length>
