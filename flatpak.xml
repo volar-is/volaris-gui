@@ -5,7 +5,7 @@
 	<name>Volaris</name>
 	<summary>Volaris GUI is a sleek Svelte/Tauri-based app for easy file encryption and decryption using key files. </summary>
 	<metadata_license>CC0-1.0</metadata_license>
-	<project_license>AGPL-3.0-only</project_license>
+	<project_license>BSD-2-Clause</project_license>
 	<developer id="com.leohanney">
 		<name>Leo Hanney</name>
 	</developer>
