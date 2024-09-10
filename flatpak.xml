@@ -3,7 +3,7 @@
 <component type="desktop-application">
 	<id>com.leohanney.Volaris</id>
 	<name>Volaris</name>
-	<summary>Volaris GUI is a sleek Svelte/Tauri-based app for easy file encryption and decryption using key files. </summary>
+	<summary>Volaris is a sleek app for easy file encryption and decryption using key files.</summary>
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>BSD-2-Clause</project_license>
 	<developer id="com.leohanney">
