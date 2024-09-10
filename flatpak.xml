@@ -17,29 +17,29 @@
 	  <color type="primary" scheme_preference="dark">#241f31</color>
 	</branding>
 	<launchable type="desktop-id">com.leohanney.Volaris.desktop</launchable>
-	<icon type="remote">https://github.com/volar-is/volaris-gui/blob/main/screenshots/AppLogo.png</icon>
+	<icon type="remote">https://volaris.leohanney.com/AppLogo.png</icon>
 	<url type="bugtracker">https://github.com/volar-is/volaris-gui/issues</url>
 	<url type="homepage">https://volaris.leohanney.com/</url>
 	<url type="contribute">https://github.com/volar-is/volaris-gui</url>
 	<screenshots>
 		<screenshot type="default">
-			<image>https://github.com/volar-is/volaris-gui/raw/main/screenshots/1.png</image>
+			<image>https://volaris.leohanney.com/screenshots/1.png</image>
 			<caption>Volaris Opening Page</caption>
 		</screenshot>
 		<screenshot type="default">
-			<image>https://github.com/volar-is/volaris-gui/raw/main/screenshots/2.png</image>
+			<image>https://volaris.leohanney.com/screenshots/2.png</image>
 			<caption>Volaris File Selection</caption>
 		</screenshot>
 		<screenshot type="default">
-			<image>https://github.com/volar-is/volaris-gui/raw/main/screenshots/3.png</image>
+			<image>https://volaris.leohanney.com/screenshots/3.png</image>
 			<caption>Volaris Keyfile Selection</caption>
 		</screenshot>
 		<screenshot type="default">
-			<image>https://github.com/volar-is/volaris-gui/raw/main/screenshots/4.png</image>
+			<image>https://volaris.leohanney.com/screenshots/4.png</image>
 			<caption>Volaris Encryption Settings</caption>
 		</screenshot>
 		<screenshot type="default">
-			<image>https://github.com/volar-is/volaris-gui/raw/main/screenshots/5.png</image>
+			<image>https://volaris.leohanney.com/screenshots/5.png</image>
 			<caption>Volaris Start Encryption</caption>
 		</screenshot>
 		
