@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2024 Leo Hanney -->
+<component type="desktop-application">
+	<id>com.leohanney.Volaris</id>
+	<name>Volaris</name>
+	<summary>Volaris GUI is a sleek Svelte/Tauri-based app for easy file encryption and decryption using key files. </summary>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>AGPL-3.0-only</project_license>
+	<developer id="com.leohanney">
+		<name>Leo Hanney</name>
+	</developer>
+	<description>
+		<p>Volaris GUI is a modern file encryption and decryption tool built with Svelte and Tauri, offering a sleek, user-friendly interface. It simplifies the process of securing files using key files, with features like drag-and-drop support, tabbed navigation, and seamless key file management. Users can easily create new key files or select existing ones, all within a responsive design using Tailwind CSS. Part of the larger Volaris project, this tool streamlines encryption workflows. </p>
+	</description>
+	<launchable type="desktop-id">com.leohanney.Volaris.desktop</launchable>
+	<icon type="remote">https://github.com/volar-is/volaris-gui/blob/main/screenshots/AppLogo.png</icon>
+	<url type="bugtracker">https://github.com/volar-is/volaris-gui/issues</url>
+	<url type="homepage">https://volaris.leohanney.com/</url>
+	<url type="contribute">https://github.com/volar-is/volaris-gui</url>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://github.com/volar-is/volaris-gui/raw/main/screenshots/1.png</image>
+			<caption>Volaris</caption>
+		</screenshot>
+	</screenshots>
+	<content_rating type="oars-1.1">
+		<content_attribute id="social-info">mild</content_attribute>
+	</content_rating>
+	<releases>	
+		<release version="0.1.0" date="2024-09-01">
+			<url type="details">https://github.com/volar-is/volaris-gui/releases/tag/app-v0.1.0</url>
+			<description>
+				<p>Release description</p>
+				<ul>
+					<li>First release of Volaris!</li>
+				</ul>
+			</description>
+		</release>
+	</releases>
+	<supports>
+		<control>pointing</control>
+		<control>keyboard</control>
+	</supports>
+	<recommends>
+		<display_length compare="ge">200</display_length>
+	</recommends>
+</component>
