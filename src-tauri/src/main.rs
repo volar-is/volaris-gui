@@ -66,8 +66,6 @@ async fn check_file_exists(app: &AppHandle, path: &PathBuf) -> Result<(), String
             .dialog()
             .message("The file already exists. Do you want to overwrite it?")
             .title("Confirm Overwrite")
-            .ok_button_label("Yes")
-            .cancel_button_label("No")
             .blocking_show();
 
         if !answer {

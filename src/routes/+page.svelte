@@ -1,5 +1,5 @@
 <script>
-  import { open, save } from "@tauri-apps/plugin-dialog";
+  import { open } from "@tauri-apps/plugin-dialog";
   import { invoke } from "@tauri-apps/api/core";
   import { listen } from "@tauri-apps/api/event";
   import PasswordPrompt from "./PasswordPrompt.svelte";
