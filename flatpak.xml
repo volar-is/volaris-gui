@@ -23,23 +23,23 @@
 	<url type="contribute">https://github.com/volar-is/volaris-gui</url>
 	<screenshots>
 		<screenshot type="default">
-			<image>https://volaris.leohanney.com/screenshots/1.png</image>
+			<image type="source>https://volaris.leohanney.com/screenshots/1.png</image>
 			<caption>Volaris Opening Page</caption>
 		</screenshot>
-		<screenshot type="default">
-			<image>https://volaris.leohanney.com/screenshots/2.png</image>
+		<screenshot>
+			<image type="source>https://volaris.leohanney.com/screenshots/2.png</image>
 			<caption>Volaris File Selection</caption>
 		</screenshot>
-		<screenshot type="default">
-			<image>https://volaris.leohanney.com/screenshots/3.png</image>
+		<screenshot>
+			<image type="source>https://volaris.leohanney.com/screenshots/3.png</image>
 			<caption>Volaris Keyfile Selection</caption>
 		</screenshot>
-		<screenshot type="default">
-			<image>https://volaris.leohanney.com/screenshots/4.png</image>
+		<screenshot>
+			<image type="source>https://volaris.leohanney.com/screenshots/4.png</image>
 			<caption>Volaris Encryption Settings</caption>
 		</screenshot>
-		<screenshot type="default">
-			<image>https://volaris.leohanney.com/screenshots/5.png</image>
+		<screenshot>
+			<image type="source>https://volaris.leohanney.com/screenshots/5.png</image>
 			<caption>Volaris Start Encryption</caption>
 		</screenshot>
 		
