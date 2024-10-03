@@ -17,6 +17,7 @@ use volaris_tools::encrypt::{execute as e_execute, Request as e_request};
 
 #[command]
 async fn create_key_file(
+    app: AppHandle,
     path: PathBuf,
     name: String,
     hash: String,
@@ -29,7 +30,9 @@ async fn create_key_file(
 
     let mut key_file_path = path;
     key_file_path.push(name);
-
+    check_file_exists(&app, &key_file_path)
+        .await
+        .map_err(|e| e.to_string())?;
     let now = std::time::Instant::now();
     let salt = gen_salt();
     let secret_data = generate_passphrase(&32).as_bytes().to_vec();

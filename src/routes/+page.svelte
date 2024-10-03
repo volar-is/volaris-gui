@@ -82,12 +82,8 @@
     if (files.length > 0) {
       if (step === 2) {
         selectedFile = files[0];
-        delay(500);
-        step = 3;
       } else if (step === 3) {
         keyFile = files[0];
-
-        step = 4;
       }
     }
   });
@@ -96,10 +92,16 @@
     showPasswordDialog = true;
   }
 
-  function handlePasswordSubmit(event) {
+  async function handlePasswordSubmit(event) {
     password = event.detail.password;
+    newKeyFilePath = event.detail.selectedDirectory;
     showPasswordDialog = false;
-    createKeyFile();
+    if (newKeyFilePath != "") {
+      alert("Creating keyfile... this might take a second");
+      createKeyFile();
+    } else {
+      alert("An error occurred.");
+    }
   }
 
   function handlePasswordCancel() {
@@ -114,26 +116,18 @@
       } else {
         selectedFile =
           file && typeof file === "string" ? file : file?.path || "";
-        delay(500);
-        step = 3;
       }
     } else if (option === "key") {
       if (file === null) {
         return;
       } else {
         keyFile = file && typeof file === "string" ? file : file?.path || "";
-        delay(500);
-        step = 4;
       }
     }
   }
 
   async function saveKeyFile() {
-    const file = await open({ directory: true });
-    newKeyFilePath = file && typeof file === "string" ? file : file || "";
-    if (newKeyFilePath) {
-      showPasswordDialogHandler();
-    }
+    showPasswordDialogHandler();
   }
 
   async function delay(milliseconds) {
@@ -284,7 +278,10 @@
           }
 
           if (permissionGranted) {
-            sendNotification({ title: "Volaris", body: "Your file has been decrypted!" });
+            sendNotification({
+              title: "Volaris",
+              body: "Your file has been decrypted!",
+            });
           }
           alert("File decrypted successfully: " + result);
         } else {
@@ -453,9 +450,24 @@
             </p>
             {#if selectedFile}
               <div class="mt-4 text-xs md:text-sm text-gray-400">
-                <p title={selectedFile}>Selected file:</p>
-                <p title={selectedFile} class="text-gray-300">
-                  {selectedFile.split("/").pop()}
+                <p title={selectedFile} class="flex items-center">
+                  <svg
+                    class="w-4 h-4 text-green-500 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span class="text-gray-300 font-bold"
+                    >{selectedFile.split("/").pop()}</span
+                  >
                 </p>
                 <span
                   class="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 bg-gray-700 text-gray-200 p-2 md:p-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -470,26 +482,27 @@
 
       {#if step === 3}
         <div class="flex flex-col items-center space-y-4 md:space-y-6">
-          <div
-            class="w-full max-w-7xl p-4 md:p-6 rounded-lg"
-          >
+          <div class="w-full max-w-7xl p-4 md:p-6 rounded-lg">
             <h2
               class="text-center text-xl md:text-2xl font-semibold text-gray-100 mb-4"
             >
               Key File Management
             </h2>
             <div class="flex flex-col gap-4">
-              <button
-                on:click={saveKeyFile}
-                class="px-4 py-2 md:px-6 md:py-3 text-base md:text-lg font-semibold bg-purple-600 hover:bg-purple-500 text-white rounded-full flex items-center justify-center transition-all duration-300 focus:ring-4 focus:ring-purple-300"
-                style="height: 48px;"
-              >
-                <span class="material-symbols-outlined text-base md:text-lg"
-                  >create</span
+              {#if !keyFile}
+                <button
+                  on:click={saveKeyFile}
+                  class="px-4 py-2 md:px-6 md:py-3 text-base md:text-lg font-semibold bg-purple-600 hover:bg-purple-500 text-white rounded-full flex items-center justify-center transition-all duration-300 focus:ring-4 focus:ring-purple-300"
+                  style="height: 48px;"
                 >
-                <span class="md:inline md:ml-3">Create New Key File</span>
-              </button>
+                  <span class="material-symbols-outlined text-base md:text-lg"
+                    >create</span
+                  >
+                  <span class="md:inline md:ml-3">Create New Key File</span>
+                </button>
+              {/if}
               {#if actionTab === "encrypt" || actionTab === "decrypt"}
+                {#if !keyFile}
                 <div class="relative text-center mt-4">
                   <div class="flex items-center">
                     <div
@@ -503,7 +516,7 @@
                     ></div>
                   </div>
                 </div>
-
+                {/if}
                 <div
                   id="keyDrag"
                   on:dragover={(event) => {
@@ -524,9 +537,24 @@
                   </p>
                   {#if keyFile}
                     <div class="mt-4 text-xs md:text-sm text-gray-400">
-                      <p title={keyFile}>Selected file:</p>
-                      <p title={keyFile} class="text-gray-300">
-                        {keyFile.split("/").pop()}
+                      <p title={keyFile} class="flex items-center">
+                        <svg
+                          class="w-4 h-4 text-green-500 mr-2"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        <span class="text-gray-300 font-bold"
+                          >{keyFile.split("/").pop()}</span
+                        >
                       </p>
                       <span
                         class="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 bg-gray-700 text-gray-200 p-2 md:p-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
