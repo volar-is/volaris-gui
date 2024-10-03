@@ -5,7 +5,7 @@ use std::io::Read;
 use std::ops::Deref;
 use std::path::PathBuf;
 use tauri::{command, AppHandle};
-use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use volaris_crypto::header::{
     HashingAlgorithm, HeaderType, HeaderVersion, ARGON2ID_LATEST, BLAKE3BALLOON_LATEST,
 };
@@ -66,6 +66,7 @@ async fn check_file_exists(app: &AppHandle, path: &PathBuf) -> Result<(), String
             .dialog()
             .message("The file already exists. Do you want to overwrite it?")
             .title("Confirm Overwrite")
+            .buttons(MessageDialogButtons::OkCancel)
             .blocking_show();
 
         if !answer {
