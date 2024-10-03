@@ -4,7 +4,7 @@
   import "./app.css";
 
   let password = "";
-  let selectedDirectory = "";  // Holds the selected directory path
+  let selectedDirectory = "";
   const dispatch = createEventDispatcher();
 
   function submit() {
@@ -20,7 +20,6 @@
   }
 
   async function openDirectoryPicker() {
-    // Simulate a directory picker (or implement actual picker logic here)
     const file = await open({ directory: true });
     selectedDirectory = file && typeof file === "string" ? file : file || ""
   }
@@ -38,14 +37,12 @@
     </button>
     <h3 class="text-2xl font-semibold text-pink-400 mb-4">Enter Filename</h3>
     
-    <!-- Filename Input -->
     <input
       bind:value={password}
       placeholder="Filename"
       class="w-full px-4 py-2 mb-4 border border-gray-600 rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:border-pink-500 focus:ring focus:ring-pink-300"
     />
     
-    <!-- Directory Selection Button -->
     <button
       on:click={openDirectoryPicker}
       class="w-full px-4 py-2 mb-4 bg-gray-600 text-white rounded-lg shadow-md hover:bg-gray-500 transition duration-200"
