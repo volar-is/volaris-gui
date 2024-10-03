@@ -1,11 +1,10 @@
 [Desktop Entry]
 Categories=Utility
-Comment=Volaris GUI is a sleek app for easy file encryption and decryption using key files
+Comment=Volaris is a sleek app for easy file encryption and decryption using key files
 Exec=volaris-gui
 Icon=volaris-gui
 Keywords=Encryption;Decryption;Rust;Volaris
 Name=Volaris
-StartupNotify=true
 Terminal=false
 Type=Application
 Version=0.0.1
