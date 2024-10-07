@@ -440,13 +440,7 @@
             style="min-height: 300px;"
           >
             <p class="text-gray-300 text-base md:text-lg">
-              Drag & drop a file here or
-              <a
-                on:click={() => pickFile("file")}
-                class="text-purple-600 hover:text-purple-400 cursor-pointer"
-              >
-                Select a file
-              </a>
+              Drag & drop a file here or Select a file
             </p>
             {#if selectedFile}
               <div class="mt-4 text-xs md:text-sm text-gray-400">
