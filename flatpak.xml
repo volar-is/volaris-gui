@@ -49,6 +49,15 @@
 		<content_attribute id="social-info">mild</content_attribute>
 	</content_rating>
 	<releases>	
+				<release version="0.4.0" date="2024-10-07">
+			<url type="details">https://github.com/volar-is/volaris-gui/releases/tag/app-v0.4.0</url>
+			<description>
+				<p>Release description</p>
+				<ul>
+					<li>Fix Version for Github Action</li>
+				</ul>
+			</description>
+		</release>
 		<release version="0.3.0" date="2024-10-07">
 			<url type="details">https://github.com/volar-is/volaris-gui/releases/tag/app-v0.3.0</url>
 			<description>
@@ -60,15 +69,6 @@
 				<p>New Contributors</p>
 				<ul>
 					<li>@iLynxcat made their first contribution in https://github.com/volar-is/volaris-gui/pull/1</li>
-				</ul>
-			</description>
-		</release>
-		<release version="0.1.0" date="2024-09-01">
-			<url type="details">https://github.com/volar-is/volaris-gui/releases/tag/app-v0.1.0</url>
-			<description>
-				<p>Release description</p>
-				<ul>
-					<li>First release of Volaris!</li>
 				</ul>
 			</description>
 		</release>
