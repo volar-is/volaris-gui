@@ -48,8 +48,17 @@
 	<content_rating type="oars-1.1">
 		<content_attribute id="social-info">mild</content_attribute>
 	</content_rating>
-	<releases>	
-			<release version="0.4.0" date="2024-10-07">
+	<releases>
+		<release version="0.5.0" date="2024-10-19">
+			<url type="details">https://github.com/volar-is/volaris-gui/releases/tag/app-v0.5.0</url>
+			<description>
+				<p>Release description</p>
+				<ul>
+					<li>Add multiple file encryption / decryption!</li>
+				</ul>
+			</description>
+		</release>
+		<release version="0.4.0" date="2024-10-07">
 			<url type="details">https://github.com/volar-is/volaris-gui/releases/tag/app-v0.4.0</url>
 			<description>
 				<p>Release description</p>
