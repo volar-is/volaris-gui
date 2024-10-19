@@ -12,6 +12,10 @@
   import "./app.css";
 
   let selectedFile = "";
+  let selectedFileText = "";
+  let selectedFileArray = [];
+  let selectedFileBool = false;
+  let selectedFileArrayBool = false;
   let keyFile = "";
   let showPasswordDialog = false;
   let password = "";
@@ -109,15 +113,30 @@
   }
 
   async function pickFile(option) {
-    const file = await open({ multiple: false });
     if (option === "file") {
+      const file = await open({ multiple: true });
       if (file === null) {
         return;
       } else {
-        selectedFile =
-          file && typeof file === "string" ? file : file?.path || "";
+        if (file.length > 1) {
+          selectedFileText = "Multiple Files Selected";
+          selectedFileArray = file;
+          selectedFile = "";
+          selectedFileBool = true;
+          selectedFileArrayBool = true;
+        } else {
+          selectedFile =
+            file[0] && typeof file[0] === "string"
+              ? file[0]
+              : file[0]?.path || "";
+          selectedFileText = selectedFile;
+          selectedFileArray = [];
+          selectedFileBool = true;
+          selectedFileArrayBool = false;
+        }
       }
     } else if (option === "key") {
+      const file = await open({ multiple: false });
       if (file === null) {
         return;
       } else {
@@ -173,11 +192,11 @@
   }
 
   async function encryptFile() {
-    if (selectedFile && keyFile) {
+    if (selectedFileBool && keyFile) {
       try {
         const confirmation = await ask(
           "Are you sure you want to encrypt this file?",
-          { title: "Confirmation", kind: "warning" },
+          { title: "Confirmation", kind: "warning" }
         );
         if (confirmation) {
           isProcessing = true;
@@ -194,34 +213,52 @@
             }
           }, progdelay);
 
-          const result = await invoke("encrypt_file_with_key", {
-            input: selectedFile,
-            output: `${selectedFile}.enc`,
-            keyfile: keyFile,
-            hash: selectedHashAlgorithm,
-            ealgorithm: selectedEncryptionAlgorithm,
-            headerver: selectedHeaderVersion,
-          });
+          let result;
 
-          clearInterval(interval);
-          progress = 100;
-          await delay(1000);
-          elapsedTime = (Date.now() - startTime) / 1000;
-          isProcessing = false;
+          if (selectedFileArrayBool) {
+            selectedFileArray.forEach(async (file) => {
+              console.log(selectedFileArray, file);
+              result = await invoke("encrypt_file_with_key", {
+                input: file,
+                output: `${file}.enc`,
+                keyfile: keyFile,
+                hash: selectedHashAlgorithm,
+                ealgorithm: selectedEncryptionAlgorithm,
+                headerver: selectedHeaderVersion,
+              });
+              clearInterval(interval);
+              progress = 100;
+              await delay(1000);
+              elapsedTime = (Date.now() - startTime) / 1000;
+              isProcessing = false;
+              alert(
+                file.split("\\").pop().split("/").pop() +
+                  " encrypted successfully."
+              );
+            });
+          } else {
+            result = await invoke("encrypt_file_with_key", {
+              input: selectedFile,
+              output: `${selectedFile}.enc`,
+              keyfile: keyFile,
+              hash: selectedHashAlgorithm,
+              ealgorithm: selectedEncryptionAlgorithm,
+              headerver: selectedHeaderVersion,
+            });
+            clearInterval(interval);
+            progress = 100;
+            await delay(1000);
+            elapsedTime = (Date.now() - startTime) / 1000;
+            isProcessing = false;
+            alert("File encrypted successfully: " + result);
+          }
+
           let permissionGranted = await isPermissionGranted();
 
           if (!permissionGranted) {
             const permission = await requestPermission();
             permissionGranted = permission === "granted";
           }
-
-          if (permissionGranted) {
-            sendNotification({
-              title: "Volaris",
-              body: "Your file has been encrypted!",
-            });
-          }
-          alert("File encrypted successfully: " + result);
         } else {
           alert("Encryption canceled.");
         }
@@ -230,7 +267,7 @@
         isProcessing = false;
         alert("Error during encryption: " + error);
       }
-    } else if (!selectedFile) {
+    } else if (!selectedFileBool) {
       alert("Please select a file first.");
     } else if (!keyFile) {
       alert("Please select or create a keyfile first.");
@@ -238,11 +275,11 @@
   }
 
   async function decryptFile() {
-    if (selectedFile && keyFile) {
+    if (selectedFileBool && keyFile) {
       try {
         const confirmation = await ask(
           "Are you sure you want to decrypt this file?",
-          { title: "Confirmation", kind: "warning" },
+          { title: "Confirmation", kind: "warning" }
         );
         if (confirmation) {
           isProcessing = true;
@@ -259,33 +296,47 @@
             }
           }, progdelay);
 
-          const result = await invoke("decrypt_file_with_key", {
-            input: selectedFile,
-            output: selectedFile.replace(".enc", ""),
-            keyfile: keyFile,
-          });
+          let result;
 
-          clearInterval(interval);
-          progress = 100;
-          await delay(1000);
-          elapsedTime = (Date.now() - startTime) / 1000;
-          isProcessing = false;
+          if (selectedFileArrayBool) {
+            selectedFileArray.forEach(async (file) => {
+              result = await invoke("decrypt_file_with_key", {
+                input: file,
+                output: file.replace(".enc", ""),
+                keyfile: keyFile,
+              });
+              clearInterval(interval);
+              progress = 100;
+              await delay(1000);
+              elapsedTime = (Date.now() - startTime) / 1000;
+              isProcessing = false;
+              alert(
+                file.split("\\").pop().split("/").pop() +
+                  " decrypted successfully."
+              );
+            });
+          } else {
+            const result = await invoke("decrypt_file_with_key", {
+              input: selectedFile,
+              output: selectedFile.replace(".enc", ""),
+              keyfile: keyFile,
+            });
+            clearInterval(interval);
+            progress = 100;
+            await delay(1000);
+            elapsedTime = (Date.now() - startTime) / 1000;
+            isProcessing = false;
+            alert("File decrypted successfully: " + result);
+          }
+
           let permissionGranted = await isPermissionGranted();
 
           if (!permissionGranted) {
             const permission = await requestPermission();
             permissionGranted = permission === "granted";
           }
-
-          if (permissionGranted) {
-            sendNotification({
-              title: "Volaris",
-              body: "Your file has been decrypted!",
-            });
-          }
-          alert("File decrypted successfully: " + result);
         } else {
-          alert("Decryption canceled.");
+          alert("Encryption canceled.");
         }
       } catch (error) {
         clearInterval(interval);
@@ -442,9 +493,9 @@
             <p class="text-gray-300 text-base md:text-lg">
               Drag & drop a file here or Select a file
             </p>
-            {#if selectedFile}
+            {#if selectedFileBool}
               <div class="mt-4 text-xs md:text-sm text-gray-400">
-                <p title={selectedFile} class="flex items-center">
+                <p title={selectedFileText} class="flex items-center">
                   <svg
                     class="w-4 h-4 text-green-500 mr-2"
                     xmlns="http://www.w3.org/2000/svg"
@@ -459,14 +510,13 @@
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span class="text-gray-300 font-bold"
-                    >{selectedFile.split("/").pop()}</span
+                  <span class="text-gray-300 font-bold">{selectedFileText}</span
                   >
                 </p>
                 <span
                   class="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 bg-gray-700 text-gray-200 p-2 md:p-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 >
-                  {selectedFile}
+                  {selectedFileText}
                 </span>
               </div>
             {/if}
@@ -497,19 +547,19 @@
               {/if}
               {#if actionTab === "encrypt" || actionTab === "decrypt"}
                 {#if !keyFile}
-                <div class="relative text-center mt-4">
-                  <div class="flex items-center">
-                    <div
-                      class="flex-1 h-0.5 bg-gradient-to-r from-gray-700 to-gray-500"
-                    ></div>
-                    <span class="px-4 text-gray-300 text-1xl font-semibold"
-                      >OR</span
-                    >
-                    <div
-                      class="flex-1 h-0.5 bg-gradient-to-l from-gray-700 to-gray-500"
-                    ></div>
+                  <div class="relative text-center mt-4">
+                    <div class="flex items-center">
+                      <div
+                        class="flex-1 h-0.5 bg-gradient-to-r from-gray-700 to-gray-500"
+                      ></div>
+                      <span class="px-4 text-gray-300 text-1xl font-semibold"
+                        >OR</span
+                      >
+                      <div
+                        class="flex-1 h-0.5 bg-gradient-to-l from-gray-700 to-gray-500"
+                      ></div>
+                    </div>
                   </div>
-                </div>
                 {/if}
                 <div
                   id="keyDrag"
