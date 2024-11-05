@@ -49,6 +49,15 @@
 		<content_attribute id="social-info">mild</content_attribute>
 	</content_rating>
 	<releases>
+		<release version="0.6.0" date="2024-11-05">
+			<url type="details">https://github.com/volar-is/volaris-gui/releases/tag/app-v0.6.0</url>
+			<description>
+				<p>Release description</p>
+				<ul>
+					<li>Add new logos!</li>
+				</ul>
+			</description>
+		</release>
 		<release version="0.5.0" date="2024-10-19">
 			<url type="details">https://github.com/volar-is/volaris-gui/releases/tag/app-v0.5.0</url>
 			<description>
