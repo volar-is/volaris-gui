@@ -1,8 +1,8 @@
 # Volaris GUI
 
-Volaris GUI is a sleek and modern Svelte/Tauri-based application designed to streamline the process of file encryption and decryption using key files. This tool offers a user-friendly interface with drag-and-drop support, tabbed navigation, and seamless key file management.
+Volaris GUI is a sleek and modern Svelte/Tauri-based app designed to streamline the process of file encryption and decryption using key files.
 
-Volaris GUI is a sub-project of [Volaris](https://github.com/volar-is/volaris), find out more info about Volaris and it's encryption methods there.
+Volaris GUI is a sub-project of [Volaris](https://github.com/volar-is/volaris). Find out more info about Volaris and its encryption methods there.
 
 RPM BUILDS DO NOT WORK.
 
@@ -10,7 +10,6 @@ RPM BUILDS DO NOT WORK.
 
 - **File Encryption & Decryption**: Easily encrypt or decrypt files with just a few clicks.
 - **Key File Management**: Create new key files or select existing ones directly from the app.
-- **Drag-and-Drop Support**: Quickly select files by dragging them into the designated area.
 - **Modern UI**: A clean and responsive design using Svelte and Tailwind CSS.
 
 ## Screenshots
@@ -26,7 +25,7 @@ More in [here.](./screenshots)
 To run the project, you'll need to have the following installed:
 
 - [Node.js](https://nodejs.org/) (v18.x or later *should* work)
-- [Pnpm](https://pnpm.io)
+- [pnpm](https://pnpm.io)
 - [Tauri](https://tauri.app/)
 
 ### Installation
@@ -52,26 +51,11 @@ To run the project, you'll need to have the following installed:
 
 ### Usage
 
-1. **File Encryption**:
-
-   - Navigate to the "File" tab.
-   - Drag and drop your file into the drop zone, or click to select a file.
-   - Choose to "Encrypt File" to secure your data.
-
-2. **File Decryption**:
-
-   - Navigate to the "File" tab.
-   - Drag and drop your encrypted file into the drop zone, or click to select a file.
-   - Choose to "Decrypt File" to unlock your data.
-
-3. **Key File Management**:
-
-   - Navigate to the "Key File" tab.
-   - Create a new key file by clicking "Create New Key File" or select an existing key file.
+Pretty self explanatory. Outdated info was here.
 
 ### Contributing
 
-We welcome contributions from the community. To contribute:
+To contribute:
 
 1. Fork the repository.
 2. Create a new branch:
@@ -82,17 +66,8 @@ We welcome contributions from the community. To contribute:
    `git push origin feature/YourFeature`
 5. Open a pull request.
 
-Please ensure your code adheres to our coding standards and includes appropriate tests.
-
 **Note:** This repository uses conventional commits. Please follow the [conventional commits guidelines](https://www.conventionalcommits.org/en/v1.0.0/) for your commit messages.
 
 ### License
-
-
 This project is licensed under the BSD 2-Clause License License. See the [LICENSE](/LICENSE) file for details.
 
-### Acknowledgments
-
-- [Svelte](https://svelte.dev/) - The JavaScript framework used for building the UI.
-- [Tauri](https://tauri.app/) - Framework for building tiny, fast binaries for all major desktop platforms.
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework for styling.
